@@ -24,7 +24,7 @@ def test_readme_clones_new_core_repo():
     root = Path(__file__).resolve().parents[1]
     readme = (root / "README.md").read_text(encoding="utf-8")
     assert (
-        "git clone --branch release/os28-os29-clean "
+        "git clone --branch v0.1.0 "
         "https://github.com/gyodragos-cell/ana-max-os29-core.git"
     ) in readme
     assert "cd ana-max-os29-core" in readme
