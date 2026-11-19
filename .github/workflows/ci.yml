@@ -1,0 +1,54 @@
+name: OS29 Core privacy and tests
+
+on:
+  push:
+    branches: [main, "release/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python 3.12 / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install package in clean environment
+        run: python -m pip install -e ".[test]"
+      - name: Tracked files and privacy regex scan
+        run: python scripts/privacy_gate.py
+      - name: Compile Python modules
+        run: python -m compileall -q os29 integrations examples scripts tests
+      - name: Complete pytest suite
+        run: python -m pytest -q
+      - name: Offline SQLite and OS28 mock smoke
+        run: python scripts/offline_smoke.py
+      - name: Git whitespace check
+        run: git diff --check
+
+  gitleaks:
+    name: Gitleaks mandatory full-history scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Scan source and Git history (required)
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: "false"
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "false"
