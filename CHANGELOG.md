@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — clean OS29 Core proposal
+## v0.1.0 — initial public OS29 Core release
 
 - Curated portable OS29 core and WorkUnitService code.
 - MCP STDIO and CLI with generic local configuration defaults.
