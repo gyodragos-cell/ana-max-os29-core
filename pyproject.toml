@@ -12,7 +12,7 @@ license = {file = "LICENSE"}
 dependencies = []
 
 [project.optional-dependencies]
-test = ["pytest>=8"]
+test = ["pytest>=8", "pytest-cov>=6"]
 
 [project.scripts]
 os29 = "os29.cli:main"
