@@ -43,26 +43,38 @@ agent decides what to do with it.
 
 ## Quick start
 
-Requires Python 3.11 or newer.
+Requires Python 3.11 or newer. The examples below call the virtual-environment
+interpreter directly, so no PowerShell execution-policy or shell activation is needed.
+
+Clone the published v0.1.0 tag:
 
     git clone --branch v0.1.0 https://github.com/gyodragos-cell/ana-max-os29-core.git
     cd ana-max-os29-core
     python -m venv .venv
-    python -m pip install -e ".[test]"
-    python -m compileall -q os29 integrations examples scripts tests
-    python -m pytest -q
-    python scripts/privacy_gate.py
-    python scripts/offline_smoke.py
-    python -m os29.cli --help
 
-The command above checks out the versioned v0.1.0 release. For ongoing development,
-clone without --branch to use main. After creating the virtual environment,
-use .venv/Scripts/python.exe on Windows or .venv/bin/python on Linux and macOS.
+Windows PowerShell:
 
-The smoke test creates an isolated **temporary** SQLite database and removes it
-afterwards. The application does not need an existing private store, a lab
-computer, a gateway service or a network connection for these basic tests.
-Installing dependencies initially may require a package index.
+    .\.venv\Scripts\python.exe -m pip install -e ".[test]"
+    .\.venv\Scripts\python.exe -m compileall -q os29 integrations examples scripts tests
+    .\.venv\Scripts\python.exe -m pytest -q
+    .\.venv\Scripts\python.exe scripts/privacy_gate.py
+    .\.venv\Scripts\python.exe scripts/offline_smoke.py
+
+Linux / macOS:
+
+    .venv/bin/python -m pip install -e ".[test]"
+    .venv/bin/python -m compileall -q os29 integrations examples scripts tests
+    .venv/bin/python -m pytest -q
+    .venv/bin/python scripts/privacy_gate.py
+    .venv/bin/python scripts/offline_smoke.py
+
+For ongoing development, clone without --branch to use main. The v0.1.0 release
+is immutable; newer demonstrations on main are intentionally not part of that tag.
+
+These tests create isolated **temporary** SQLite databases and remove them.
+The package needs no existing private memory store, laboratory computer,
+gateway service or network connection for basic tests. Initial dependency
+installation may require the package index.
 
 ## Conceptual workflow
 
@@ -73,6 +85,26 @@ Installing dependencies initially may require a package index.
 
 The offline smoke proves persistence and resume across separate Store objects.
 It does **not** imply that two actual AI models executed the workflow.
+
+## Reproduce process handoff and crash recovery (current main)
+
+The main development branch has an additional, public integration demonstration,
+not part of the immutable v0.1.0 tag:
+
+    git clone https://github.com/gyodragos-cell/ana-max-os29-core.git
+    cd ana-max-os29-core
+    python scripts/two_process_handoff_demo.py
+
+This runs **three separate Python processes** over one disposable SQLite store:
+Agent A hands off, Agent B persists a checkpoint before an intentional abrupt exit,
+and restarted Agent B restores context, runs a real smoke command and completes.
+Expected child exits are 0 / 23 / 0; the parent exits 0 on success. It is **not**
+a simulation of two language-model reasoning systems or a test of private OS28.
+
+The current main branch also tests the actual MCP STDIO JSON-RPC interface
+from independent server subprocesses. See [reproducible handoff demo](docs/PROCESS_HANDOFF_DEMO.md).
+The unit and integration test suite measures statement/branch coverage in CI
+with an initial 60% minimum; this does not certify production readiness.
 
 ## Known limitations
 
@@ -89,6 +121,7 @@ It does **not** imply that two actual AI models executed the workflow.
 ## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md)
+- [Independent process and MCP handoff demo](docs/PROCESS_HANDOFF_DEMO.md)
 - [Offline quick start](docs/QUICK_START.md)
 - [Security boundary](docs/SECURITY_BOUNDARY.md)
 - [Roadmap](docs/ROADMAP.md)
