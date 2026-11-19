@@ -45,7 +45,7 @@ agent decides what to do with it.
 
 Requires Python 3.11 or newer.
 
-    git clone --branch release/os28-os29-clean https://github.com/gyodragos-cell/ana-max-os29-core.git
+    git clone --branch v0.1.0 https://github.com/gyodragos-cell/ana-max-os29-core.git
     cd ana-max-os29-core
     python -m venv .venv
     python -m pip install -e ".[test]"
@@ -55,9 +55,9 @@ Requires Python 3.11 or newer.
     python scripts/offline_smoke.py
     python -m os29.cli --help
 
-The command above checks out the release branch while PR #1 is reviewed.
-After merge, a normal clone of the main branch is also supported. On Windows, invoke the Python interpreter under
-.venv/Scripts; on Linux and macOS use .venv/bin.
+The command above checks out the versioned v0.1.0 release. For ongoing development,
+clone without --branch to use main. After creating the virtual environment,
+use .venv/Scripts/python.exe on Windows or .venv/bin/python on Linux and macOS.
 
 The smoke test creates an isolated **temporary** SQLite database and removes it
 afterwards. The application does not need an existing private store, a lab
