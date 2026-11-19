@@ -1,0 +1,100 @@
+name: OS29 Core v0.1.0 release
+
+on:
+  push:
+    tags:
+      - v0.1.0
+
+permissions:
+  contents: read
+
+jobs:
+  clean-install:
+    name: Clean install / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Create isolated virtual environment
+        run: python -m venv .venv
+      - name: Install and test (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $py = '.\.venv\Scripts\python.exe'
+          & $py -m pip install -e '.[test]'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $py -m compileall -q os29 integrations examples scripts tests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $py -m pytest -q
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $py scripts/privacy_gate.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $py scripts/offline_smoke.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $py -m os29.cli --help
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Install and test (Ubuntu)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          .venv/bin/python -m pip install -e '.[test]'
+          .venv/bin/python -m compileall -q os29 integrations examples scripts tests
+          .venv/bin/python -m pytest -q
+          .venv/bin/python scripts/privacy_gate.py
+          .venv/bin/python scripts/offline_smoke.py
+          .venv/bin/python -m os29.cli --help
+      - name: Git whitespace check
+        run: git diff --check
+
+  gitleaks:
+    name: Mandatory Gitleaks full Git history
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Scan repository and history
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: "false"
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "false"
+
+  github-release:
+    name: Publish verified GitHub Release
+    needs: [clean-install, gitleaks]
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify tag and release inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "v0.1.0"
+          test -f docs/RELEASE_NOTES_v0.1.0.md
+          git tag --points-at HEAD | grep -Fx 'v0.1.0'
+          gh --version
+      - name: Publish GitHub Release (no private artifacts)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create "v0.1.0" --repo "$GITHUB_REPOSITORY" --verify-tag --title "OS29 Core v0.1.0" --notes-file docs/RELEASE_NOTES_v0.1.0.md --latest
