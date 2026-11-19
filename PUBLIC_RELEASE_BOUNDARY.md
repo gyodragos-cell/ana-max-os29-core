@@ -17,6 +17,7 @@ supplies their own provider and configuration. This branch does not claim live
 OS28 integration, measured tool counts, agent reasoning or enterprise
 certification.
 
-History: this proposal descends from public main. Its clean file tree does
-not remove data from older Git objects. Any real historical secret requires
-a separate rotation and incident decision without automatic rewriting.
+History: this new OS29 Core repository starts from a clean root commit.
+It does not inherit the separate legacy portfolio repository history.
+Any potential historical secrets in the legacy repository require a separate
+incident review and credential rotation, not rewriting this clean repository.

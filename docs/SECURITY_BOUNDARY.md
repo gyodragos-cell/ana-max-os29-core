@@ -9,7 +9,7 @@ scope checks do not replace an operating-system permissions policy. Optional
 network/terminal integrations have their own risk profiles and should be
 reviewed before use in production.
 
-The current public repository has Git history prior to this clean release
-branch. Deleting a tracked file in this branch does not erase its earlier
-contents from existing commits. Report discovered historical credentials
-privately and rotate them separately; no history rewriting is performed here.
+This new OS29 Core repository starts from a clean root commit and does not
+include Git objects from the separate legacy portfolio repository.
+Report discovered credentials privately and rotate them as needed; the
+legacy repository's historical data remains a separate review task.

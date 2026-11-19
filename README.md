@@ -45,8 +45,8 @@ agent decides what to do with it.
 
 Requires Python 3.11 or newer.
 
-    git clone https://github.com/gyodragos-cell/ana-max-os29.git
-    cd ana-max-os29
+    git clone --branch release/os28-os29-clean https://github.com/gyodragos-cell/ana-max-os29-core.git
+    cd ana-max-os29-core
     python -m venv .venv
     python -m pip install -e ".[test]"
     python -m compileall -q os29 integrations examples scripts tests
@@ -55,8 +55,8 @@ Requires Python 3.11 or newer.
     python scripts/offline_smoke.py
     python -m os29.cli --help
 
-For the proposed clean release, checkout branch release/os28-os29-clean
-before installing. On Windows, invoke the Python interpreter under
+The command above checks out the release branch while PR #1 is reviewed.
+After merge, a normal clone of the main branch is also supported. On Windows, invoke the Python interpreter under
 .venv/Scripts; on Linux and macOS use .venv/bin.
 
 The smoke test creates an isolated **temporary** SQLite database and removes it
@@ -82,7 +82,7 @@ It does **not** imply that two actual AI models executed the workflow.
 - Optional network tools require operator-provided configuration and review.
 - No local AI inference engine, semantic embeddings, Frida or live OS28 gateway
   are included.
-- This branch does not erase historic content from the public main Git history.
+- This repository has a clean Git history, separate from the legacy portfolio repository.
 - Documentation describes a developer preview, not a certified institution
   deployment or a measured performance advantage.
 

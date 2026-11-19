@@ -2,7 +2,8 @@
 
 Requirements: Python 3.11+ and Git.
 
-1. Clone the repository and checkout release/os28-os29-clean.
+1. Clone this repository: git clone --branch release/os28-os29-clean https://github.com/gyodragos-cell/ana-max-os29-core.git
+   Then: cd ana-max-os29-core. After merging PR #1, the default main branch works too.
 2. Create a Python venv: python -m venv .venv
 3. Install: python -m pip install -e ".[test]"
 4. Compile: python -m compileall -q os29 integrations examples scripts tests
