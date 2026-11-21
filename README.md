@@ -11,6 +11,26 @@ integrations/os28 package is only a portable interface and a deterministic
 offline mock. It does not contain the proprietary or private local OS28
 implementation. Connecting an actual tool provider is optional.
 
+## See the difference: a reproducible memory fix
+
+**Before:** an old event whose JSON omitted `event_id` could silently disappear from memory search.
+
+**Now:** the indexer uses the existing SQLite primary key to recover it **without changing the original event**.
+
+Run this real test on temporary, synthetic data:
+
+    python examples/see_the_difference.py
+
+Expected output:
+
+    BEFORE legacy record indexed: 0
+    AFTER  legacy record retrieved: 1
+    RAW EVENT UNCHANGED: True
+    OS29_PUBLIC_DIFFERENCE_DEMO_PASS
+
+Read [the full before/after walkthrough and measured research results](docs/SEE_THE_DIFFERENCE.md).
+Those measurements compare lexical, semantic and hybrid retrieval in a **private sampled pilot**, not a feature already shipped or a publicly reproducible accuracy claim. The public runtime still uses FTS5/BM25.
+
 ## The problem
 
 AI clients routinely lose context, repeat diagnostics and confuse observations

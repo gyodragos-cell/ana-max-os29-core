@@ -254,7 +254,7 @@ def _source_documents(store: Store) -> list[dict[str, Any]]:
     docs: list[dict[str, Any]] = []
     with store._connect() as conn:
         event_rows = conn.execute(
-            "SELECT event_json FROM trace_events ORDER BY timestamp DESC LIMIT 50000"
+            "SELECT event_id, event_json FROM trace_events ORDER BY timestamp DESC LIMIT 50000"
         ).fetchall()
         incident_rows = conn.execute("SELECT * FROM incidents ORDER BY updated_at DESC LIMIT 10000").fetchall()
         capsule_rows = conn.execute("SELECT * FROM mission_capsules ORDER BY updated_at DESC LIMIT 5000").fetchall()
@@ -270,8 +270,18 @@ def _source_documents(store: Store) -> list[dict[str, Any]]:
     for row in event_rows:
         try:
             event = json.loads(row["event_json"])
-            if isinstance(event, dict) and event.get("event_id"):
-                docs.append(_event_document(event))
+            if not isinstance(event, dict):
+                continue
+            # Historical event JSON may omit event_id; the SQLite primary key
+            # remains authoritative. Hydrate a temporary copy for FTS5 only.
+            db_event_id = row["event_id"]
+            payload_event_id = event.get("event_id")
+            if payload_event_id and payload_event_id != db_event_id:
+                # Never index a contradictory embedded identifier.
+                continue
+            if not payload_event_id:
+                event["event_id"] = db_event_id
+            docs.append(_event_document(event))
         except (json.JSONDecodeError, TypeError, ValueError):
             continue
 
