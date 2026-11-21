@@ -2,6 +2,9 @@
 
 ## Unreleased (after v0.1.0)
 
+- Fixed legacy FTS5 extraction for historical JSON lacking an event ID, using the authoritative SQLite primary key; unchanged original traces and mismatch regression tests.
+- Added a reproducible synthetic before/after example and clearly separated, bounded local lexical-vs-semantic research results.
+
 - Added reproducible three-process Work Unit handoff, abrupt-exit checkpoint and recovery demo using only disposable SQLite.
 - Added separate MCP STDIO JSON-RPC subprocess handoff tests, including malformed input and verification receipts.
 - Measure branch coverage in Windows/Ubuntu CI with an initial 60% floor; report actual coverage to guide future tests.
