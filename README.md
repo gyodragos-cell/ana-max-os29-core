@@ -31,6 +31,25 @@ Expected output:
 Read [the full before/after walkthrough and measured research results](docs/SEE_THE_DIFFERENCE.md).
 Those measurements compare lexical, semantic and hybrid retrieval in a **private sampled pilot**, not a feature already shipped or a publicly reproducible accuracy claim. The public runtime still uses FTS5/BM25.
 
+## See a real bug class: two agents, one repaired cosine ranking
+
+A local GPT-6 / Qwen7B collaboration discovered and repaired an experimental
+cosine-ranking defect. Qwen generated a partial patch and GPT-6 corrected the
+final matrix expression; we retain that attribution rather than claiming a
+standalone model success.
+
+Run the **synthetic public RED ? GREEN reproduction** without AI models or
+private OS29 data:
+
+    python examples/cosine_red_green_demo.py
+    python -m pytest -q tests/test_cosine_red_green_demo.py
+
+Expected marker: `OS29_PUBLIC_COSINE_RED_GREEN_DEMO_PASS`.
+
+Read [the technical walkthrough and evidence limitations](docs/TWO_AGENTS_REAL_BUG_REPAIR.md).
+This is an offline mathematical example; it does not change OS29's FTS5
+production search or independently reproduce the private two-model run.
+
 ## The problem
 
 AI clients routinely lose context, repeat diagnostics and confuse observations
